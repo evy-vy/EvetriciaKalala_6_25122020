@@ -6,7 +6,7 @@ const path = require('path');//donne accès au chemin du système de fichier
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
-mongoose.connect('mongodb+srv://evyNew:fullStackTest@cluster0.4y2zp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://janeDoe:soPekocko@cluster1.bkypy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true

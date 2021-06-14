@@ -16,3 +16,5 @@ module.exports = ((req, res, next) => {
     res.status(401).json({ error: error | 'Requête non authentifiée' }) // catch récupère et renvoi les erreurs 
   }
 });
+
+//auth permet de chiffrer le mdp de l'utilisateur et de l'ajouter a la base de donnée, de verif les infos d'identification de l'utilisateur
