@@ -1,3 +1,5 @@
+//Les routes: ExpressJS se présente comme un routeur où l'on va déclarer les routes supportées par notre application ainsi que le traitement à effectuer lorsque cette dernière est rencontrée.
+
 const express = require('express');
 const router = express.Router();
 

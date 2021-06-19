@@ -1,7 +1,18 @@
+//Logique métier appliquées aux routes utilisateurs
+
+
+/*
+* bcrypt est un algorithme permettant le hashage de mdp
+* Le package jwt (jsonwebtoken) permet d'attribuer un token à un utilisateur au moment de sa connexion
+* User correspond au schema mangoose
+*/
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+
+//Creation d'un nouvel utilisateur
 
 exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
@@ -16,6 +27,16 @@ exports.signup = (req, res, next) => {
     })
     .catch(error => res.status(500).json({ error }));
 };
+
+
+//middleware pour la connexion d'un utilisateur
+/*
+* On récupère le mail passé dans le corps de la requete
+* on compare le mail de l'utilisateur, s'il est différent une erreur est retourné
+* sinon on compare le mdp et le hash
+* si incorrect, une erreur est renvoyé
+* si ok 
+*/
 
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
