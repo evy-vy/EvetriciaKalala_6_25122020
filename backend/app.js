@@ -1,10 +1,12 @@
 /*
+*Le module dotenv permet de masquer les informations de connexion à la bdd grâce aux variables d'environnement
 * Express = framework pour node.js qui permet de creer une appli web plus simplement. Elle fournit un ensemble de méthode permettant de traiter les requêtes HTTP et fournit un système de middleware pour étendre ses fonctionnalitées.
 * Mongoose
 * Helmet aide à protéger votre application de certaines des vulnérabilités bien connues du Web en configurant de manière appropriée des en-têtes HTTP.
 * Path donne accès au chemin du système de fichier
 */
 
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
@@ -12,7 +14,7 @@ const path = require('path');
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
-mongoose.connect('mongodb+srv://janeDoe:soPekocko@cluster1.bkypy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+mongoose.connect(process.env.DB_URI,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -20,8 +22,16 @@ mongoose.connect('mongodb+srv://janeDoe:soPekocko@cluster1.bkypy.mongodb.net/myF
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-
-//on utilise le framework express dans l'app  
+/*
+*on utilise le framework express dans l'app
+* Helmet sécurise l'application avec les En-têtes HTTP. Par défaut, il aide à appliquer les en-têtes suivants.
+- Pré-extraction DNS
+- Masquer X-Powered-By
+- HTTP Strict Transport Security
+- Pas de reniflement
+- Protections XSS
+- ...
+*/
 const app = express();
 app.use(helmet());
 

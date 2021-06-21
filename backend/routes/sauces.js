@@ -1,9 +1,14 @@
-//Les routes: ExpressJS se présente comme un routeur où l'on va déclarer les routes supportées par notre application ainsi que le traitement à effectuer lorsque cette dernière est rencontrée.
+/*Les routes: ExpressJS se présente comme un routeur où l'on va déclarer les routes supportées par notre application ainsi que le traitement à effectuer lorsque cette dernière est rencontrée.
+*
+*
+* on applique le middleware auth aux routes que l'on souhaite proteger
+*/
+
 
 const express = require('express');
 const router = express.Router();
 
-const auth = require('../middleware/auth'); //on applique le middleware auth aux routes que l'on souhaite proteger
+const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 const sauceCtrl = require('../controllers/sauce');

@@ -136,11 +136,12 @@ exports.likeOrDislikeSauce = (req, res) => {
   const sauceId = req.params.id;
   const userId = req.body.userId;
   const like = req.body.like;
+
   switch (like) {
     case 0:
       Sauce.findOne({ _id: sauceId })
         .then((sauce) => {
-          if (sauce.usersLiked) {
+          if (sauce.usersLiked.includes(userId)) {
             Sauce.updateOne({ _id: sauceId }, {
               $pull: { usersLiked: userId },
               $inc: { likes: -1 }
@@ -152,7 +153,7 @@ exports.likeOrDislikeSauce = (req, res) => {
                 res.status(400).json({ error });
               });
 
-          } if (sauce.userDisliked) {
+          } if (sauce.usersDisliked.includes(userId)) {
             Sauce.updateOne({ _id: sauceId }, {
               $pull: { usersDisliked: userId },
               $inc: { dislikes: -1 }
