@@ -3,22 +3,27 @@
 
 /*
 * bcrypt est un algorithme permettant le hashage de mdp
-* Le package jwt (jsonwebtoken) permet d'attribuer un token à un utilisateur au moment de sa connexion
+*   Le package jwt (jsonwebtoken) permet d'attribuer un token à un utilisateur au moment de sa connexion
 * User correspond au schema mangoose
 */
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const cryptoJs = require('crypto-js');
 const User = require('../models/user');
+// const dotenv = require('dotenv')
+require('dotenv').config();
 
-//Creation d'un nouvel utilisateur
+let key = cryptoJs.enc.Hex.parse('' + process.env.AES_KEY + '');
+let iv = cryptoJs.enc.Hex.parse('' + process.env.AES_IV + '');
+
+// const encryptedEmail = cryptoJs.AES.encrypt(req.body.email, key, { iv: iv }).toString();
 
 exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
       const user = new User({
-        email: req.body.email,
+        email: cryptoJs.AES.encrypt(req.body.email, key, { iv: iv }).toString(),
         password: hash
       });
       user.save()
@@ -39,7 +44,8 @@ exports.signup = (req, res, next) => {
 */
 
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+  let encryptedEmail = cryptoJs.AES.encrypt(req.body.email, key, { iv: iv }).toString();
+  User.findOne({ email: encryptedEmail })
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: 'Utilisateur non trouvé !' });//401 = non autorisé
@@ -53,7 +59,7 @@ exports.login = (req, res, next) => {
             userId: user._id,
             token: jwt.sign(
               { userId: user._id },
-              'RANDOM_TOKEN_SECRET', //chaine secrete de developpement temporaire pour encoder le token
+              process.env.TOKEN, //contient une chaine secrete de developpement temporaire pour encoder le token
               { expiresIn: '24h' }
             )//la fonction sign permet d'encoder un new token qui contient l'id utilisateur en tant que payload 
           });

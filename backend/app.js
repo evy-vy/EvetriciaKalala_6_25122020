@@ -3,6 +3,7 @@
 * Express = framework pour node.js qui permet de creer une appli web plus simplement. Elle fournit un ensemble de méthode permettant de traiter les requêtes HTTP et fournit un système de middleware pour étendre ses fonctionnalitées.
 * Mongoose
 * Helmet aide à protéger votre application de certaines des vulnérabilités bien connues du Web en configurant de manière appropriée des en-têtes HTTP.
+* mongoSanitize nettoie les données fournie par l'utilisateur afin d'empecher l'injection
 * Path donne accès au chemin du système de fichier
 */
 
@@ -10,6 +11,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
@@ -43,6 +45,10 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+app.use(mongoSanitize({
+  replaceWith: '_'
+}));
 
 /*
 * express doit traiter la ressources images de manière statique chaque fois qu'elle reçoit une requête vers la route images.
