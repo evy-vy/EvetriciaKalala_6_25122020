@@ -7,30 +7,44 @@
 * User correspond au schema mangoose
 */
 
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cryptoJs = require('crypto-js');
 const User = require('../models/user');
-// const dotenv = require('dotenv')
-require('dotenv').config();
 
 let key = cryptoJs.enc.Hex.parse('' + process.env.AES_KEY + '');
 let iv = cryptoJs.enc.Hex.parse('' + process.env.AES_IV + '');
 
-// const encryptedEmail = cryptoJs.AES.encrypt(req.body.email, key, { iv: iv }).toString();
+
+const checkMail = (mail) => {
+  let regExpMail = new RegExp("^[0-9a-zA-Z._-]+@{1}[0-9a-z.-]{2,}[.]{1}[a-z]{2,5}");
+  return regExpMail.test(mail);
+};
+
+const checkPassword = (password) => {
+  let regExPassword = new RegExp("^[0-9a-zA-Z-+!*@%_]{8,15}");
+  return regExPassword.test(password);
+};
 
 exports.signup = (req, res, next) => {
-  bcrypt.hash(req.body.password, 10)
-    .then(hash => {
-      const user = new User({
-        email: cryptoJs.AES.encrypt(req.body.email, key, { iv: iv }).toString(),
-        password: hash
-      });
-      user.save()
-        .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-        .catch(error => res.status(400).json({ error }));
-    })
-    .catch(error => res.status(500).json({ error }));
+  if (!checkMail(req.body.email)) {
+    res.status(400).json({ message: "Veuillez saisir une adresse email valide" });
+  } else if (!checkPassword(req.body.password)) {
+    res.status(400).json({ message: "Merci de saisir un mot de passe sécurisé : 8 caractères min, 15 caractères max, au moins : 1 minuscule, 1 majuscule, 1 chiffre, 1 caractère spécial" })
+  } else {
+    bcrypt.hash(req.body.password, 10)
+      .then(hash => {
+        const user = new User({
+          email: cryptoJs.AES.encrypt(req.body.email, key, { iv: iv }).toString(),
+          password: hash
+        });
+        user.save()
+          .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
+          .catch(error => res.status(400).json({ error }));
+      })
+      .catch(error => res.status(500).json({ error }));
+  }
 };
 
 
@@ -60,7 +74,7 @@ exports.login = (req, res, next) => {
             token: jwt.sign(
               { userId: user._id },
               process.env.TOKEN, //contient une chaine secrete de developpement temporaire pour encoder le token
-              { expiresIn: '24h' }
+              { expiresIn: '10h' }
             )//la fonction sign permet d'encoder un new token qui contient l'id utilisateur en tant que payload 
           });
         })
