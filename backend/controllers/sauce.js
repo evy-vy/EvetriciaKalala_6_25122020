@@ -1,15 +1,12 @@
+//controllers sauce
+
 // file system de node donne accès aux fonctions qui nous permettent de modifier le système de fichiers, y compris aux fonctions permettant de supprimer les fichiers.
+
 const Sauce = require('../models/sauce');
 const fs = require('fs');
 
 
 //creation d'une sauce
-/*
-*pour ajouter un fichier à la requête, le front envoi les données sous la forme form-data et non pas JSON. la    requête sauce sera donc un string qu'il faut transformer en objet exploitable
-* On supprime l'id généré automatiquement et envoyé par le front-end. L'id de la sauce est créé par la base MongoDB lors de la création dans la base
-* création d'une instance de l'objet Sauce
-* imageUrl: ex: http://localhost:3000/images/nom de fichier
-*/
 
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
@@ -25,17 +22,6 @@ exports.createSauce = (req, res, next) => {
 
 
 //modification de la sauce (opérateur ternaire)
-/* 
-* Lors de la modif, on verifie si un fichier a été modifié. 
-* on cherche la sauce à modif grace à son id présent dans les params de la requête
-* on utilise l'url de l'image pour en extraire le segment /images/ contenu dans l'url pour séparer le nom de fichier
-* on récupère l'ancien fichier puis on le supprime
-* unlinkSync supprime le fichier de manière synchrone(le fichier doit être supprimé avant l'exécution des instructions suivante)
-* on paramètre le corps de la requête de la sauce pour pouvoir manipuler les données et remplacer ajouter la nouvelle image. 
-* SINON 
-* les paramètres de la sauces présent dans le corps de la requête sont récupérées 
-* Les données de la sauce sélectionnée par son id sont MAJ
-*/
 
 exports.modifySauce = (req, res, next) => {
   let sauceObject;
@@ -68,12 +54,6 @@ exports.modifySauce = (req, res, next) => {
 }
 
 //supprime la sauce et le fichier dans le dossier img
-/*
-* on récupère l'id de la sauce à supprimer dans les param de requete 
-* on récupère l'url de l'image et en extrait le segment /images/ contenu dedans pour séparer le nom de fichier
-* la fonction unlink supprime les fichiers
-* on supprime donc le fichier correspondant de la bdd
-*/
 
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
@@ -99,11 +79,6 @@ exports.getOneSauce = (req, res, next) => {
 
 
 //renvoi toutes les sauces
-/*
-* find permet de récupérer l'ensemble des sauces disponibles dans le tableau des sauces dans la base de donnée
-* si tout est ok, les données sont retournées
-* sinon on retourne un message d'erreur
-*/
 
 exports.getAllSauce = (req, res, next) => {
   Sauce.find()
@@ -112,26 +87,7 @@ exports.getAllSauce = (req, res, next) => {
 };
 
 
-//switch like/dislike
-/*
-* La condition switch me permet d'appliquer différente instructions selon les 3 cas: 
-*
-* Cas 0 : Un utilisateur annule son choix : 
-On recup l'id de la sauce concernée dans les params de la req, 
-on vérifie si l'id de l'utilisateur est présent dans le tableau usersLiked ou disLiked de la sauce concernée, 
-si tel est le cas, on met à jour cette sauce dans la bdd :
-avec $pull, on supprime l'id de l'utilisateur du tableau concerné
-on décrémente le like ou le dislike de -1
-*
-* Cas 1 : Un utilisateur "aime" une sauce : 
-Les like de la sauce concernées vont être incrémenté de 1 grâce à l'opérateur $inc de mongodb
-$push ajoute une valeur spécifié à un array, ici l'ID de l'utilisateur votant
-*
-* Cas -1 : Un utilisateur "n'aime pas" une sauce : 
-Même procédé que pour le cas 1
-*
-
-*/
+//switch like/dislike : La condition switch me permet d'appliquer différente instructions selon les 3 cas: 
 
 exports.likeOrDislikeSauce = (req, res) => {
   const sauceId = req.params.id;
