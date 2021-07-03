@@ -110,7 +110,8 @@ exports.likeOrDislikeSauce = (req, res) => {
                 res.status(400).json({ error });
               });
 
-          } if (sauce.usersDisliked.includes(userId)) {
+          }
+          if (sauce.usersDisliked.includes(userId)) {
             Sauce.updateOne({ _id: sauceId }, {
               $pull: { usersDisliked: userId },
               $inc: { dislikes: -1 }
@@ -122,34 +123,51 @@ exports.likeOrDislikeSauce = (req, res) => {
                 res.status(400).json({ error });
               });
           }
+          if (!sauce.usersLiked.includes(userId) && !sauce.usersDisliked.includes(userId)) {
+            res.status(400).json({ message: "L'utilisateur n'est dans aucun tableau !" })
+          }
         })
         .catch((error) => res.status(404).json({ error }));
       break;
 
     case 1:
-      Sauce.updateOne({ _id: sauceId }, {
-        $push: { usersLiked: userId },
-        $inc: { likes: 1 }
-      })
-        .then(() => {
-          res.status(201).json({ message: "J'aime !" });
+      Sauce.findOne({ _id: sauceId })
+        .then((sauce) => {
+          if (sauce.usersLiked.includes(userId)) {
+            res.status(400).json({ message: "Votre choix à déja été pris en compte" })
+          } else {
+            Sauce.updateOne({ _id: sauceId }, {
+              $push: { usersLiked: userId },
+              $inc: { likes: 1 }
+            })
+              .then(() => {
+                res.status(201).json({ message: "J'aime !" });
+              })
+              .catch((error) => {
+                res.status(400).json({ error });
+              });
+          }
         })
-        .catch((error) => {
-          res.status(400).json({ error });
-        });
       break;
 
     case -1:
-      Sauce.updateOne({ _id: sauceId }, {
-        $push: { usersDisliked: userId },
-        $inc: { dislikes: 1 }
-      })
-        .then(() => {
-          res.status(201).json({ message: "Je n'aime pas !" });
+      Sauce.findOne({ _id: sauceId })
+        .then((sauce) => {
+          if (sauce.usersDisliked.includes(userId)) {
+            res.status(400).json({ message: "Votre choix à déja été pris en compte" })
+          } else {
+            Sauce.updateOne({ _id: sauceId }, {
+              $push: { usersDisliked: userId },
+              $inc: { dislikes: 1 }
+            })
+              .then(() => {
+                res.status(201).json({ message: "Je n'aime pas !" });
+              })
+              .catch((error) => {
+                res.status(400).json({ error });
+              });
+          }
         })
-        .catch((error) => {
-          res.status(400).json({ error });
-        });
       break;
     default:
       console.log('Bad request');
